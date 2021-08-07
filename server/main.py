@@ -13,6 +13,7 @@ from server import config
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/data", StaticFiles(directory="data"), name="data")
 
 
 @app.get('/')
