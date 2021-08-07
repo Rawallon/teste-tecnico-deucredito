@@ -20,8 +20,9 @@ function displayState() {
 }
 
 async function parseProductList() {
-    const invoiceData = await fetchData('/data/invoices.json')
-    const nameData = await fetchData('/data/products.json')
+    const invoiceData = await fetchData('api/data/invoices')
+    console.log(typeof invoiceData);
+    const nameData = await fetchData('api/data/products')
     const itemList = {}
     invoiceData.map(obj => {
         // Set para evitar que o mesmo valor seja incluido mais de uma vez

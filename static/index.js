@@ -10,8 +10,8 @@ async function fetchData(url) {
 }
 
 async function fetchProductsData(params) {
-    invoiceData = await fetchData('/data/invoices.json')
-    nameData = await fetchData('/data/products.json')
+    invoiceData = await fetchData('api/data/invoices')
+    nameData = await fetchData('api/data/products')
 }
 
 function displayState() {
