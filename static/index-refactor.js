@@ -1,6 +1,7 @@
 var firstChallengeElement = document.getElementById('first-challenge');
 var secondChallengeElement = document.getElementById('second-challenge');
 var thirdChallengeElement = document.getElementById('third-challenge');
+var filterChallengeElement = document.getElementById('filter-challenge');
 let [isFetching, parsedProducts, parsedTypes] = [true, [], []];
 
 async function fetchData(url) {
@@ -51,8 +52,14 @@ function createSecondChallengeGraph() {
 }
 
 function createThirdChallengeGraph() {
-    // itemList[obj.id] = { quantity: (itemList[obj.id] || 0) + obj.quantity, name: objDetails.name, type: objDetails.type }
+    const itemList = {}
+    for (const product in parsedProducts) {
+        itemList[parsedProducts[product].type] = { quantity: (itemList[parsedProducts[product].type]?.quantity || 0) + parsedProducts[product].quantity, name: parsedProducts[product].type }
+    }
+    thirdChallengeElement.innerHTML = generateGraphHTML(itemList)
+}
 
+function createFilterChallengeGraph() {
     const itemList = {}
     for (const product in parsedProducts) {
         itemList[parsedProducts[product].id] = { quantity: (itemList[product.name]?.id || 0) + parsedProducts[product].id, name: parsedProducts[product].name, type: parsedProducts[product].type }
@@ -63,10 +70,10 @@ function createThirdChallengeGraph() {
     selectType.id = 'type-selector'
     selectType.onchange = (e) => {
         const productList = filterProductByType(e.target.value);
-        thirdChallengeElement.innerHTML = generateGraphHTML(productList);
+        filterChallengeElement.innerHTML = generateGraphHTML(productList);
     }
 
-    thirdChallengeElement.insertAdjacentElement('beforebegin', selectType)
+    filterChallengeElement.insertAdjacentElement('beforebegin', selectType)
     for (const type in itemType) {
         const typeName = itemType[type];
         var option = document.createElement("option");
@@ -76,7 +83,7 @@ function createThirdChallengeGraph() {
     }
 
     const chosenTypeProducts = filterProductByType(itemType[0])
-    thirdChallengeElement.innerHTML = generateGraphHTML(chosenTypeProducts)
+    filterChallengeElement.innerHTML = generateGraphHTML(chosenTypeProducts)
 }
 
 function filterProductByType(typeName) {
@@ -111,4 +118,5 @@ parseProductList().then(() => {
     createFirstChallengeGraph()
     createSecondChallengeGraph()
     createThirdChallengeGraph()
+    createFilterChallengeGraph()
 }).catch(err => console.log(err))
