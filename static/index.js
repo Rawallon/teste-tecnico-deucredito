@@ -1,7 +1,7 @@
 var firstChallengeElement = document.getElementById('first-challenge');
 var secondChallengeElement = document.getElementById('second-challenge');
 var thirdChallengeElement = document.getElementById('third-challenge');
-let [isFetching, invoiceData, nameData] = [true, null, null];
+let [isFetching, invoiceData, nameData, parsedProducts] = [true, null, null, []];
 
 async function fetchData(url) {
     const response = await fetch(url);
@@ -71,10 +71,58 @@ function createSecondChallengeGraph() {
     }
 }
 
+function createThirdChallengeGraph() {
+    const itemList = {}
+    let itemType = []
+
+    invoiceData.map(obj => {
+        // Set para evitar que o mesmo valor seja incluido mais de uma vez
+        itemType = [...new Set(nameData.flatMap(el => el.type))]
+        const objDetails = nameData.find(x => x.id == obj.product_id)
+        itemList[obj.id] = { quantity: (itemList[obj.id] || 0) + obj.quantity, name: objDetails.name, type: objDetails.type }
+    })
+    parsedProducts = itemList
+
+    // Cria select
+    var selectType = document.createElement("select");
+    selectType.id = 'type-selector'
+    selectType.onchange = (e) => generateThirdGraph(e.target.value)
+    thirdChallengeElement.insertAdjacentElement('beforebegin',selectType)
+    for (const type in itemType) {
+        const typeName = String(itemType[type]).toLowerCase()
+       var option = document.createElement("option");
+       option.value = typeName;
+       option.text = typeName;
+       selectType.appendChild(option);
+    }
+    generateThirdGraph(itemType[0])
+
+}
+
+function generateThirdGraph(typeName) {
+    const choosenType = Object.values(parsedProducts).filter(product => String(product.type).toLowerCase() == String(typeName).toLowerCase())
+    const maxNumber = [...Object.values(choosenType)].reduce((max, value) => Math.max(max || 0, value.quantity), [Infinity, -Infinity])
+    let productsHTML = "";
+    for (const item in choosenType) {
+        const qty = Number(choosenType[item].quantity).toFixed(2)
+        productsHTML += `<br /><div class="item--wrapper">
+        <div class="bar" style="height: ${(qty / maxNumber) * 100}px;">
+        <span>${qty}</span>
+        </div>
+            <div class="item--data">
+            <div class="number">${qty}</div>
+                <div class="item">${choosenType[item].name}</div>
+            </div>
+        </div>`
+    }
+    thirdChallengeElement.innerHTML = productsHTML
+}
+
 displayState()
 fetchProductsData().then(() => {
     isFetching = false;
     createFirstChallengeGraph()
     createSecondChallengeGraph()
+    createThirdChallengeGraph()
     displayState()
 }).catch(err => console.log(err))
