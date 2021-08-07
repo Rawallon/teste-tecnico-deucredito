@@ -23,8 +23,32 @@ function displayState() {
     }
 }
 
+function createFirstChallengeGraph() {
+    const itemList = {}
+
+    invoiceData.map(obj => {
+        const name = nameData.find(x => x.id == obj.product_id).name
+        itemList[name] = (itemList[name] || 0) + obj.quantity
+    })
+
+    const maxNumber = Math.max(...Object.values(itemList))
+    for (const item in itemList) {
+        const qty = Number(itemList[item]).toFixed(2)
+        firstChallengeElement.innerHTML += `<div class="item--wrapper">
+        <div class="bar" style="height: ${(qty / maxNumber) * 100}px;">
+        <span>${qty}</span>
+        </div>
+            <div class="item--data">
+            <div class="number">${qty}</div>
+                <div class="item">${item}</div>
+            </div>
+        </div>`
+    }
+}
+
 displayState()
 fetchProductsData().then(() => {
     isFetching = false;
+    createFirstChallengeGraph()
     displayState()
 }).catch(err => console.log(err))
