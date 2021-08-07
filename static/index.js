@@ -46,9 +46,35 @@ function createFirstChallengeGraph() {
     }
 }
 
+function createSecondChallengeGraph() {
+    const itemList = {}
+
+    invoiceData.map(obj => {
+        const parsedDate = new Date(obj.date)
+        const date = parsedDate.getDate() + "/" + (parsedDate.getMonth() + 1) + "/" + parsedDate.getFullYear()
+        itemList[obj.id] = { quantity: (itemList[obj.id] || 0) + obj.quantity, date }
+    })
+
+    const maxNumber = [...Object.values(itemList)].reduce((max, value) => Math.max(max || 0, value.quantity), [Infinity, -Infinity])
+
+    for (const item in itemList) {
+        const qty = Number(itemList[item].quantity).toFixed(2)
+        secondChallengeElement.innerHTML += `<div class="item--wrapper">
+        <div class="bar" style="height: ${(qty / maxNumber) * 100}px;">
+        <span>${qty}</span>
+        </div>
+            <div class="item--data">
+            <div class="number">${qty}</div>
+                <div class="item">${itemList[item].date}</div>
+            </div>
+        </div>`
+    }
+}
+
 displayState()
 fetchProductsData().then(() => {
     isFetching = false;
     createFirstChallengeGraph()
+    createSecondChallengeGraph()
     displayState()
 }).catch(err => console.log(err))
